@@ -8,11 +8,16 @@ const initialItems = [
 ];
 
 function App() {
+  const [items, setItems] = useState([]);
+
+  function handleDeleteItem(id) {
+    setItems((items) => items.filter((item) => item.id !== id));
+  }
   return (
     <div className="app">
       <LogoHeader />
-      <Form />
-      <PackingList />
+      <Form setItems={setItems} />
+      <PackingList items={items} handleDeleteItem={handleDeleteItem} />
       <Stats />
     </div>
   );
@@ -21,14 +26,18 @@ function App() {
 function LogoHeader() {
   return <h1>🌴🍸Far Away💼🛫</h1>;
 }
-function Form() {
+function Form({ setItems }) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
+
+  //function handleAddItems(item) {}
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!description) return;
     const newItem = { description, quantity, packed: false, id: Date.now() };
+    console.log(newItem);
+    setItems((items) => [newItem, ...items]);
     setDescription("");
     setQuantity(1);
   }
@@ -55,25 +64,28 @@ function Form() {
     </form>
   );
 }
-function PackingList() {
+function PackingList({ items, handleDeleteItem }) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
-          <Item itemObj={item} key={item.id} />
+        {items.map((item) => (
+          <Item
+            itemObj={item}
+            key={item.id}
+            handleDeleteItem={handleDeleteItem}
+          />
         ))}
       </ul>
     </div>
   );
 }
-function Item({ itemObj }) {
+function Item({ itemObj, handleDeleteItem }) {
   return (
     <li>
       <span style={itemObj.packed ? { textDecoration: "line-through" } : {}}>
-        {itemObj.quantity}
-        {itemObj.description}
+        {itemObj.quantity} {itemObj.description}
       </span>
-      <button>❌</button>
+      <button onClick={() => handleDeleteItem(itemObj.id)}>❌</button>
     </li>
   );
 }
